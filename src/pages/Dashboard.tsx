@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth, MOCK_USERS } from '../contexts/AuthContext';
@@ -92,110 +91,71 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Welcome back, {user?.name}!
-        </h1>
-        <p className="text-gray-600">Connect with other community members</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Members</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{MOCK_USERS.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Community Messages</CardTitle>
-            <MessageSquare className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{messages.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Your Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">Online</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="h-screen flex flex-col">
+      <div className="flex-1 flex">
         {/* Community Chat */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <div className="flex-1 flex flex-col bg-white">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
               Community Chat
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-96 flex flex-col">
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((message) => {
-                  const isOwnMessage = message.senderId === user?.id;
-                  
-                  return (
-                    <div
-                      key={message.id}
-                      className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`flex space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                        <Avatar className="h-8 w-8 flex-shrink-0">
-                          <AvatarImage src={message.senderAvatar} alt={message.senderName} />
-                          <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
-                            {message.senderName.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
-                          <p className="text-xs font-medium mb-1">{message.senderName}</p>
-                          <p className="text-sm">{message.content}</p>
-                          <p className={`text-xs mt-1 ${isOwnMessage ? 'text-purple-200' : 'text-gray-500'}`}>
-                            {formatTime(message.timestamp)}
-                          </p>
-                        </div>
+            </h2>
+          </div>
+          
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => {
+                const isOwnMessage = message.senderId === user?.id;
+                
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage src={message.senderAvatar} alt={message.senderName} />
+                        <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
+                          {message.senderName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
+                        <p className="text-xs font-medium mb-1">{message.senderName}</p>
+                        <p className="text-sm">{message.content}</p>
+                        <p className={`text-xs mt-1 ${isOwnMessage ? 'text-purple-200' : 'text-gray-500'}`}>
+                          {formatTime(message.timestamp)}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-              
-              <div className="border-t p-4">
-                <form onSubmit={handleSendMessage} className="flex space-x-2">
-                  <Input
-                    placeholder="Type your message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button type="submit" size="sm" disabled={!newMessage.trim()}>
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
+                  </div>
+                );
+              })}
+              <div ref={messagesEndRef} />
             </div>
-          </CardContent>
-        </Card>
+            
+            <div className="border-t p-4">
+              <form onSubmit={handleSendMessage} className="flex space-x-2">
+                <Input
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  className="flex-1"
+                />
+                <Button type="submit" size="sm" disabled={!newMessage.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
 
-        {/* Community Members */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        {/* Community Members Sidebar */}
+        <div className="w-80 bg-gray-50 border-l border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
               <Users className="h-5 w-5" />
               Community Members
-            </CardTitle>
+            </h3>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -205,11 +165,12 @@ const Dashboard = () => {
                 className="pl-10"
               />
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+          </div>
+          
+          <div className="p-4">
+            <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
               {filteredUsers.map((member) => (
-                <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50">
+                <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={member.avatar} alt={member.name} />
                     <AvatarFallback className="bg-purple-100 text-purple-700">
@@ -241,8 +202,8 @@ const Dashboard = () => {
                 <p className="text-gray-500">No members found matching "{searchTerm}"</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
