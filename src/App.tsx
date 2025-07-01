@@ -8,7 +8,6 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
-import ChatPage from "./pages/ChatPage";
 import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
@@ -39,7 +38,6 @@ const AppContent = () => {
         <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/profile/:userId?" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-        <Route path="/chat/:userId" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
         <Route path="/" element={<Navigate to="/dashboard" />} />
         <Route path="*" element={<NotFound />} />
