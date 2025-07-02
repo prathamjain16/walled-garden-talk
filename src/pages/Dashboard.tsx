@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageSquare, Users, Search, Send } from 'lucide-react';
-
 interface Message {
   id: string;
   senderId: string;
@@ -15,7 +14,6 @@ interface Message {
   senderName: string;
   senderAvatar?: string;
 }
-
 const Dashboard = () => {
   const {
     user
@@ -81,21 +79,18 @@ const Dashboard = () => {
     });
   };
   const otherUsers = MOCK_USERS.filter(u => u.id !== user?.id);
-  const filteredUsers = otherUsers.filter(u => 
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  return (
-    <div className="h-screen flex flex-col">
-      <div className="flex-1 flex min-h-0">
+  const filteredUsers = otherUsers.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()));
+  return <div className="h-screen flex flex-col">
+      <div className="flex-1 flex">
         {/* Community Chat */}
-        <div className="flex-1 flex flex-col bg-white min-h-0">
-          <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-2">
+        <div className="flex-1 flex flex-col bg-white">
+          
+          
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map(message => {
-                const isOwnMessage = message.senderId === user?.id;
-                return (
-                  <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+              const isOwnMessage = message.senderId === user?.id;
+              return <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                     <div className={`flex space-x-2 max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                       <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={message.senderAvatar} alt={message.senderName} />
@@ -111,20 +106,14 @@ const Dashboard = () => {
                         </p>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  </div>;
+            })}
               <div ref={messagesEndRef} />
             </div>
             
-            <div className="flex-shrink-0 border-t p-4 bg-white mb-4">
+            <div className="border-t p-4">
               <form onSubmit={handleSendMessage} className="flex space-x-2">
-                <Input 
-                  placeholder="Type your message..." 
-                  value={newMessage} 
-                  onChange={e => setNewMessage(e.target.value)} 
-                  className="flex-1" 
-                />
+                <Input placeholder="Type your message..." value={newMessage} onChange={e => setNewMessage(e.target.value)} className="flex-1" />
                 <Button type="submit" size="sm" disabled={!newMessage.trim()}>
                   <Send className="h-4 w-4" />
                 </Button>
@@ -134,27 +123,21 @@ const Dashboard = () => {
         </div>
 
         {/* Community Members Sidebar */}
-        <div className="w-80 bg-gray-50 border-l border-gray-200 flex flex-col">
-          <div className="flex-shrink-0 p-4 border-b border-gray-200">
+        <div className="w-80 bg-gray-50 border-l border-gray-200">
+          <div className="p-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
               <Users className="h-5 w-5" />
               Community Members
             </h3>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input 
-                placeholder="Search members..." 
-                value={searchTerm} 
-                onChange={e => setSearchTerm(e.target.value)} 
-                className="pl-10" 
-              />
+              <Input placeholder="Search members..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-10" />
             </div>
           </div>
           
-          <div className="flex-1 p-4 overflow-y-auto">
-            <div className="space-y-3">
-              {filteredUsers.map(member => (
-                <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white">
+          <div className="p-4">
+            <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
+              {filteredUsers.map(member => <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={member.avatar} alt={member.name} />
                     <AvatarFallback className="bg-purple-100 text-purple-700">
@@ -166,31 +149,24 @@ const Dashboard = () => {
                       {member.name}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{member.email}</p>
-                    {member.isAdmin && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                    {member.isAdmin && <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                         Admin
-                      </span>
-                    )}
+                      </span>}
                   </div>
                   <Button asChild variant="outline" size="sm">
                     <Link to={`/profile/${member.id}`}>
                       View
                     </Link>
                   </Button>
-                </div>
-              ))}
+                </div>)}
             </div>
             
-            {filteredUsers.length === 0 && searchTerm && (
-              <div className="text-center py-4">
+            {filteredUsers.length === 0 && searchTerm && <div className="text-center py-4">
                 <p className="text-gray-500">No members found matching "{searchTerm}"</p>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
