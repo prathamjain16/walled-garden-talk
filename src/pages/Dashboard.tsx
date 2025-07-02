@@ -92,28 +92,29 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col lg:flex-row relative">
-      {/* Mobile Sidebar Toggle */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b bg-white">
-        <h2 className="text-lg font-semibold">Community Chat</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-        >
-          {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
-      </div>
+    <div className="h-[calc(100vh-64px)] flex relative">
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col bg-white min-w-0">
+        {/* Mobile Header with Sidebar Toggle */}
+        <div className="lg:hidden flex items-center justify-between p-3 border-b bg-white">
+          <h2 className="text-lg font-semibold">Community Chat</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarOpen(true)}
+            className="flex-shrink-0"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
 
-      {/* Community Chat - Main Area */}
-      <div className="flex-1 flex flex-col bg-white min-w-0 min-h-0">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
           {messages.map(message => {
             const isOwnMessage = message.senderId === user?.id;
             return (
               <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex space-x-2 max-w-[75%] sm:max-w-xs lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                <div className={`flex space-x-2 max-w-[85%] sm:max-w-[75%] lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                   <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarImage src={message.senderAvatar} alt={message.senderName} />
                     <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
@@ -135,7 +136,7 @@ const Dashboard = () => {
         </div>
         
         {/* Message Input */}
-        <div className="border-t p-4 flex-shrink-0 bg-white">
+        <div className="border-t p-3 lg:p-4 flex-shrink-0 bg-white">
           <form onSubmit={handleSendMessage} className="flex space-x-2">
             <Input 
               placeholder="Type your message..." 
@@ -143,14 +144,14 @@ const Dashboard = () => {
               onChange={e => setNewMessage(e.target.value)} 
               className="flex-1" 
             />
-            <Button type="submit" size="sm" disabled={!newMessage.trim()}>
+            <Button type="submit" size="sm" disabled={!newMessage.trim()} className="flex-shrink-0">
               <Send className="h-4 w-4" />
             </Button>
           </form>
         </div>
       </div>
 
-      {/* Community Members Sidebar */}
+      {/* Sidebar */}
       <div className={`
         ${sidebarOpen ? 'translate-x-0' : 'translate-x-full'}
         lg:translate-x-0
@@ -159,7 +160,7 @@ const Dashboard = () => {
         top-0 lg:top-auto
         right-0
         h-full lg:h-auto
-        w-80 lg:w-80
+        w-full sm:w-80 lg:w-80
         bg-gray-50 border-l border-gray-200
         flex-shrink-0
         z-50 lg:z-auto
@@ -167,7 +168,7 @@ const Dashboard = () => {
       `}>
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 flex-shrink-0">
-          <div className="flex items-center justify-between lg:justify-start mb-4">
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Users className="h-5 w-5" />
               Community Members
