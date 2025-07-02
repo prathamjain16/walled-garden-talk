@@ -91,7 +91,7 @@ const Dashboard = () => {
         {/* Community Chat */}
         <div className="flex-1 flex flex-col bg-white min-h-0">
           <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-2">
               {messages.map(message => {
                 const isOwnMessage = message.senderId === user?.id;
                 return (
@@ -117,7 +117,7 @@ const Dashboard = () => {
               <div ref={messagesEndRef} />
             </div>
             
-            <div className="flex-shrink-0 border-t p-4 bg-white">
+            <div className="flex-shrink-0 border-t p-4 bg-white mb-4">
               <form onSubmit={handleSendMessage} className="flex space-x-2">
                 <Input 
                   placeholder="Type your message..." 
