@@ -26,6 +26,16 @@ const Dashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Listen for sidebar toggle events from navbar
+  useEffect(() => {
+    const handleToggleSidebar = () => {
+      setSidebarOpen(true);
+    };
+
+    window.addEventListener('toggleSidebar', handleToggleSidebar);
+    return () => window.removeEventListener('toggleSidebar', handleToggleSidebar);
+  }, []);
+
   // Mock initial community messages
   useEffect(() => {
     const mockMessages: Message[] = [{
@@ -95,19 +105,6 @@ const Dashboard = () => {
     <div className="h-[calc(100vh-64px)] flex relative">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-white min-w-0">
-        {/* Mobile Header with Sidebar Toggle */}
-        <div className="lg:hidden flex items-center justify-between p-3 border-b bg-white">
-          <h2 className="text-lg font-semibold">Community Chat</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarOpen(true)}
-            className="flex-shrink-0"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </div>
-
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
           {messages.map(message => {

@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageSquare, Users, Settings, LogOut, User, Search } from 'lucide-react';
+import { MessageSquare, Users, Settings, LogOut, User, Search, Menu } from 'lucide-react';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -78,6 +78,21 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            {/* Mobile Menu Button (Dashboard only) */}
+            {location.pathname === '/dashboard' && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  // Trigger sidebar toggle via custom event
+                  window.dispatchEvent(new CustomEvent('toggleSidebar'));
+                }}
+                className="lg:hidden"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
+            
             {/* Search Bar */}
             <div className="relative">
               <form onSubmit={handleSearch} className="relative">
