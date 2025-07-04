@@ -1,11 +1,9 @@
-import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth, MOCK_USERS } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageSquare, Users, Settings, LogOut, User, Search, Menu } from 'lucide-react';
+import { MessageSquare, Users, Settings, LogOut, User, Menu } from 'lucide-react';
 const Navbar = () => {
   const {
     user,
@@ -13,22 +11,10 @@ const Navbar = () => {
   } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      // Navigate to dashboard with search parameter
-      navigate(`/dashboard?search=${encodeURIComponent(searchTerm)}`);
-      setShowSearchResults(false);
-      setSearchTerm('');
-    }
-  };
-  const filteredUsers = MOCK_USERS.filter(u => u.id !== user?.id && searchTerm.length > 0 && (u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()))).slice(0, 5);
   const navItems = [{
     path: '/dashboard',
     label: 'Community',
@@ -71,33 +57,6 @@ const Navbar = () => {
           }} className="lg:hidden">
                 <Menu className="h-5 w-5" />
               </Button>}
-            
-            {/* Search Bar */}
-            <div className="relative">
-              <form onSubmit={handleSearch} className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                
-              </form>
-              
-              {showSearchResults && filteredUsers.length > 0 && <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-50 mt-1">
-                  {filteredUsers.map(member => <button key={member.id} onClick={() => {
-                navigate(`/profile/${member.id}`);
-                setShowSearchResults(false);
-                setSearchTerm('');
-              }} className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 text-left">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={member.avatar} alt={member.name} />
-                        <AvatarFallback className="bg-purple-100 text-purple-700">
-                          {member.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-gray-900">{member.name}</p>
-                        <p className="text-sm text-gray-500">{member.email}</p>
-                      </div>
-                    </button>)}
-                </div>}
-            </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
