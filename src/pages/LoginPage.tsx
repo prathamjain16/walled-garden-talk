@@ -196,10 +196,6 @@ const LoginPage = () => {
           </CardContent>
         </Card>
         
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Demo accounts: admin@example.com, user1@example.com, user2@example.com</p>
-          <p className="mt-1">Password: any password will work in demo mode</p>
-        </div>
       </div>
     </div>
   );

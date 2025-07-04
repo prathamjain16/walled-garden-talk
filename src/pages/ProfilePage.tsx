@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth, MOCK_USERS } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,11 +9,22 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Edit3, Save, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Profile {
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  is_admin: boolean;
+  created_at: string;
+}
 
 const ProfilePage = () => {
   const { userId } = useParams();
   const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [profileUser, setProfileUser] = useState<Profile | null>(null);
   const [profileData, setProfileData] = useState({
     name: '',
     bio: '',
@@ -22,28 +32,57 @@ const ProfilePage = () => {
   });
 
   const isOwnProfile = !userId || userId === user?.id;
-  const profileUser = isOwnProfile ? user : MOCK_USERS.find(u => u.id === userId);
 
   useEffect(() => {
-    if (profileUser) {
-      setProfileData({
-        name: profileUser.name,
-        bio: profileUser.bio || '',
-        avatar: profileUser.avatar || ''
-      });
-    }
-  }, [profileUser]);
+    const fetchProfile = async () => {
+      const targetUserId = userId || user?.id;
+      if (!targetUserId) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', targetUserId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+      } else if (data) {
+        setProfileUser(data);
+        setProfileData({
+          name: data.display_name || '',
+          bio: data.bio || '',
+          avatar: data.avatar_url || ''
+        });
+      }
+    };
+
+    fetchProfile();
+  }, [userId, user?.id]);
 
   const handleSave = async () => {
     if (!isOwnProfile) return;
     
     try {
-      await updateProfile(profileData);
+      await updateProfile({
+        name: profileData.name,
+        bio: profileData.bio,
+        avatar: profileData.avatar
+      });
       setIsEditing(false);
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
       });
+      
+      // Refresh profile data
+      if (profileUser) {
+        setProfileUser({
+          ...profileUser,
+          display_name: profileData.name,
+          bio: profileData.bio,
+          avatar_url: profileData.avatar
+        });
+      }
     } catch (error) {
       toast({
         title: "Update failed",
@@ -56,9 +95,9 @@ const ProfilePage = () => {
   const handleCancel = () => {
     if (profileUser) {
       setProfileData({
-        name: profileUser.name,
+        name: profileUser.display_name || '',
         bio: profileUser.bio || '',
-        avatar: profileUser.avatar || ''
+        avatar: profileUser.avatar_url || ''
       });
     }
     setIsEditing(false);
@@ -82,7 +121,7 @@ const ProfilePage = () => {
         <CardHeader className="pb-6">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">
-              {isOwnProfile ? 'Your Profile' : `${profileUser.name}'s Profile`}
+              {isOwnProfile ? 'Your Profile' : `${profileUser.display_name || 'User'}'s Profile`}
             </CardTitle>
             {isOwnProfile && (
               <div className="flex space-x-2">
@@ -112,9 +151,9 @@ const ProfilePage = () => {
             <div className="md:col-span-1">
               <div className="text-center">
                 <Avatar className="h-32 w-32 mx-auto mb-4">
-                  <AvatarImage src={profileUser.avatar} alt={profileUser.name} />
+                  <AvatarImage src={profileUser.avatar_url || undefined} alt={profileUser.display_name || 'User'} />
                   <AvatarFallback className="bg-purple-100 text-purple-700 text-2xl">
-                    {profileUser.name.charAt(0)}
+                    {(profileUser.display_name || 'U').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 
@@ -130,7 +169,7 @@ const ProfilePage = () => {
                   </div>
                 )}
                 
-                {profileUser.isAdmin && (
+                {profileUser.is_admin && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 mt-4">
                     Administrator
                   </span>
@@ -149,13 +188,13 @@ const ProfilePage = () => {
                     className="mt-2"
                   />
                 ) : (
-                  <p className="mt-2 text-lg">{profileUser.name}</p>
+                  <p className="mt-2 text-lg">{profileUser.display_name || 'Unknown User'}</p>
                 )}
               </div>
               
               <div>
                 <Label htmlFor="email" className="text-base font-semibold">Email</Label>
-                <p className="mt-2 text-gray-600">{profileUser.email}</p>
+                <p className="mt-2 text-gray-600">{user?.email || 'Not available'}</p>
               </div>
               
               <div>
@@ -178,7 +217,13 @@ const ProfilePage = () => {
               
               <div>
                 <Label className="text-base font-semibold">Member Since</Label>
-                <p className="mt-2 text-gray-600">January 2024</p>
+                <p className="mt-2 text-gray-600">
+                  {new Date(profileUser.created_at).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </p>
               </div>
             </div>
           </div>

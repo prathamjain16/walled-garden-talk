@@ -1,20 +1,32 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { useAuth, MOCK_USERS } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageSquare, Users, Search, Send, Menu, X } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface Message {
   id: string;
-  senderId: string;
+  user_id: string;
   content: string;
-  timestamp: Date;
-  senderName: string;
-  senderAvatar?: string;
+  created_at: string;
+  profiles: {
+    display_name: string | null;
+    avatar_url: string | null;
+  } | null;
+}
+
+interface Profile {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  is_admin: boolean;
 }
 
 const Dashboard = () => {
@@ -22,6 +34,7 @@ const Dashboard = () => {
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
   const [messages, setMessages] = useState<Message[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -36,32 +49,98 @@ const Dashboard = () => {
     return () => window.removeEventListener('toggleSidebar', handleToggleSidebar);
   }, []);
 
-  // Mock initial community messages
+  // Fetch messages and profiles
   useEffect(() => {
-    const mockMessages: Message[] = [{
-      id: '1',
-      senderId: '1',
-      content: 'Welcome to our community chat! Feel free to introduce yourselves.',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60),
-      senderName: 'Admin User',
-      senderAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
-    }, {
-      id: '2',
-      senderId: '2',
-      content: 'Hi everyone! Excited to be part of this community.',
-      timestamp: new Date(Date.now() - 1000 * 60 * 45),
-      senderName: 'John Doe',
-      senderAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
-    }, {
-      id: '3',
-      senderId: '3',
-      content: 'Hello! Looking forward to connecting with everyone.',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30),
-      senderName: 'Jane Smith',
-      senderAvatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5c1?w=150&h=150&fit=crop&crop=face'
-    }];
-    setMessages(mockMessages);
-  }, []);
+    if (!user) return;
+
+    const fetchData = async () => {
+      // Fetch messages and profiles separately  
+      const { data: messagesData, error: messagesError } = await supabase
+        .from('messages')
+        .select('id, user_id, content, created_at')
+        .order('created_at', { ascending: true });
+
+      if (messagesError) {
+        console.error('Error fetching messages:', messagesError);
+        return;
+      }
+
+      // Fetch profiles and merge with messages
+      const { data: allProfiles, error: allProfilesError } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, avatar_url');
+
+      if (allProfilesError) {
+        console.error('Error fetching profiles for messages:', allProfilesError);
+        return;
+      }
+
+      // Create a map for easy lookup
+      const profileMap = new Map(allProfiles?.map(p => [p.user_id, p]) || []);
+      
+      // Merge messages with profile data
+      const messagesWithProfiles = messagesData?.map(msg => ({
+        ...msg,
+        profiles: profileMap.get(msg.user_id) || null
+      })) || [];
+
+      setMessages(messagesWithProfiles);
+
+      // Fetch all profiles for the sidebar
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      } else {
+        setProfiles(profilesData || []);
+      }
+    };
+
+    fetchData();
+
+    // Set up real-time subscription for messages
+    const messagesChannel = supabase
+      .channel('messages_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages'
+        },
+        async (payload) => {
+          // Fetch the new message 
+          const { data: newMessageData } = await supabase
+            .from('messages')
+            .select('id, user_id, content, created_at')
+            .eq('id', payload.new.id)
+            .single();
+
+          if (newMessageData) {
+            // Get profile for this user
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('user_id, display_name, avatar_url')
+              .eq('user_id', newMessageData.user_id)
+              .single();
+
+            const messageWithProfile = {
+              ...newMessageData,
+              profiles: profile || null
+            };
+
+            setMessages(prev => [...prev, messageWithProfile]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(messagesChannel);
+    };
+  }, [user]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
@@ -73,32 +152,39 @@ const Dashboard = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !user) return;
-    const message: Message = {
-      id: Date.now().toString(),
-      senderId: user.id,
-      content: newMessage,
-      timestamp: new Date(),
-      senderName: user.name,
-      senderAvatar: user.avatar
-    };
-    setMessages(prev => [...prev, message]);
-    setNewMessage('');
+
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        user_id: user.id,
+        content: newMessage
+      });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    } else {
+      setNewMessage('');
+    }
   };
 
-  const formatTime = (timestamp: Date) => {
-    return timestamp.toLocaleTimeString([], {
+  const formatTime = (timestamp: string) => {
+    return new Date(timestamp).toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit'
     });
   };
 
-  const otherUsers = MOCK_USERS.filter(u => u.id !== user?.id);
-  const filteredUsers = otherUsers.filter(u => 
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const otherProfiles = profiles.filter(p => p.user_id !== user?.id);
+  const filteredUsers = otherProfiles.filter(p => 
+    p.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.user_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -108,21 +194,22 @@ const Dashboard = () => {
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
           {messages.map(message => {
-            const isOwnMessage = message.senderId === user?.id;
+            const isOwnMessage = message.user_id === user?.id;
+            const senderName = message.profiles?.display_name || 'Unknown User';
             return (
               <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
                 <div className={`flex space-x-2 max-w-[85%] sm:max-w-[75%] lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                   <Avatar className="h-8 w-8 flex-shrink-0">
-                    <AvatarImage src={message.senderAvatar} alt={message.senderName} />
+                    <AvatarImage src={message.profiles?.avatar_url || undefined} alt={senderName} />
                     <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
-                      {message.senderName.charAt(0)}
+                      {senderName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
-                    <p className="text-xs font-medium mb-1">{message.senderName}</p>
+                    <p className="text-xs font-medium mb-1">{senderName}</p>
                     <p className="text-sm break-words">{message.content}</p>
                     <p className={`text-xs mt-1 ${isOwnMessage ? 'text-purple-200' : 'text-gray-500'}`}>
-                      {formatTime(message.timestamp)}
+                      {formatTime(message.created_at)}
                     </p>
                   </div>
                 </div>
@@ -196,24 +283,24 @@ const Dashboard = () => {
             {filteredUsers.map(member => (
               <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white">
                 <Avatar className="h-10 w-10 flex-shrink-0">
-                  <AvatarImage src={member.avatar} alt={member.name} />
+                  <AvatarImage src={member.avatar_url || undefined} alt={member.display_name || 'User'} />
                   <AvatarFallback className="bg-purple-100 text-purple-700">
-                    {member.name.charAt(0)}
+                    {(member.display_name || 'U').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {member.name}
+                    {member.display_name || 'Unknown User'}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">{member.email}</p>
-                  {member.isAdmin && (
+                  <p className="text-xs text-gray-500 truncate">{member.user_id}</p>
+                  {member.is_admin && (
                     <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mt-1">
                       Admin
                     </span>
                   )}
                 </div>
                 <Button asChild variant="outline" size="sm" className="flex-shrink-0">
-                  <Link to={`/profile/${member.id}`}>
+                  <Link to={`/profile/${member.user_id}`}>
                     View
                   </Link>
                 </Button>

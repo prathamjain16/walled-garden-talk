@@ -1,5 +1,15 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+
+interface Profile {
+  id: string;
+  user_id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  is_admin: boolean;
+}
 
 interface User {
   id: string;
@@ -21,107 +31,103 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock allowlist - in real app this would come from backend
-const ALLOWED_EMAILS = [
-  'admin@example.com',
-  'user1@example.com',
-  'user2@example.com',
-  'test@example.com'
-];
-
-// Mock users database
-const MOCK_USERS: User[] = [
-  {
-    id: '1',
-    name: 'Admin User',
-    email: 'admin@example.com',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-    bio: 'Community administrator',
-    isAdmin: true
-  },
-  {
-    id: '2',
-    name: 'John Doe',
-    email: 'user1@example.com',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-    bio: 'Software developer passionate about building great products'
-  },
-  {
-    id: '3',
-    name: 'Jane Smith',
-    email: 'user2@example.com',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b5c1?w=150&h=150&fit=crop&crop=face',
-    bio: 'Designer and creative thinker'
-  }
-];
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const mapSupabaseUserToUser = async (supabaseUser: SupabaseUser): Promise<User> => {
+    // Fetch profile data
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', supabaseUser.id)
+      .single();
+
+    return {
+      id: supabaseUser.id,
+      name: profile?.display_name || supabaseUser.email?.split('@')[0] || 'User',
+      email: supabaseUser.email || '',
+      avatar: profile?.avatar_url || undefined,
+      bio: profile?.bio || undefined,
+      isAdmin: profile?.is_admin || false
+    };
+  };
+
   useEffect(() => {
-    // Check for stored auth token
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        if (session?.user) {
+          const mappedUser = await mapSupabaseUserToUser(session.user);
+          setUser(mappedUser);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        mapSupabaseUserToUser(session.user).then(setUser);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
     
-    const mockUser = MOCK_USERS.find(u => u.email === email);
-    if (!mockUser) {
-      throw new Error('Invalid credentials');
-    }
-    
-    setUser(mockUser);
-    localStorage.setItem('currentUser', JSON.stringify(mockUser));
+    if (error) throw error;
   };
 
   const signup = async (email: string, password: string, name: string) => {
-    // Check if email is in allowlist
-    if (!ALLOWED_EMAILS.includes(email)) {
-      throw new Error('Email not authorized for registration');
-    }
+    const redirectUrl = `${window.location.origin}/`;
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
+    const { error } = await supabase.auth.signUp({
       email,
-      bio: ''
-    };
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: name
+        }
+      }
+    });
     
-    MOCK_USERS.push(newUser);
-    setUser(newUser);
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    if (error) throw error;
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('currentUser');
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
   const updateProfile = async (updates: Partial<User>) => {
-    if (!user) return;
+    if (!user || !session?.user) return;
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        display_name: updates.name,
+        avatar_url: updates.avatar,
+        bio: updates.bio
+      })
+      .eq('user_id', user.id);
     
+    if (error) throw error;
+    
+    // Update local state
     const updatedUser = { ...user, ...updates };
     setUser(updatedUser);
-    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-    
-    // Update in mock database
-    const userIndex = MOCK_USERS.findIndex(u => u.id === user.id);
-    if (userIndex !== -1) {
-      MOCK_USERS[userIndex] = updatedUser;
-    }
   };
 
   return (
@@ -145,6 +151,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Export MOCK_USERS for use in other components
-export { MOCK_USERS };
