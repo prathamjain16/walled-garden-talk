@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MessageSquare, Users, Settings, LogOut, User, Menu } from 'lucide-react';
+import { MessageSquare, Users, Settings, LogOut, User, Menu, Search } from 'lucide-react';
 const Navbar = () => {
   const {
     user,
@@ -55,7 +55,7 @@ const Navbar = () => {
             // Trigger sidebar toggle via custom event
             window.dispatchEvent(new CustomEvent('toggleSidebar'));
           }} className="lg:hidden">
-                <Menu className="h-5 w-5" />
+                <Search className="h-5 w-5" />
               </Button>}
 
             <DropdownMenu>
