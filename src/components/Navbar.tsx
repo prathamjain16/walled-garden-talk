@@ -1,31 +1,24 @@
-
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth, MOCK_USERS } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare, Users, Settings, LogOut, User, Search, Menu } from 'lucide-react';
-
 const Navbar = () => {
-  const { user, logout } = useAuth();
+  const {
+    user,
+    logout
+  } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
-
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -35,22 +28,21 @@ const Navbar = () => {
       setSearchTerm('');
     }
   };
-
-  const filteredUsers = MOCK_USERS.filter(u => 
-    u.id !== user?.id && 
-    searchTerm.length > 0 && 
-    (u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     u.email.toLowerCase().includes(searchTerm.toLowerCase()))
-  ).slice(0, 5);
-
-  const navItems = [
-    { path: '/dashboard', label: 'Community', icon: Users },
-    { path: '/profile', label: 'Profile', icon: User },
-    ...(user?.isAdmin ? [{ path: '/admin', label: 'Admin', icon: Settings }] : [])
-  ];
-
-  return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
+  const filteredUsers = MOCK_USERS.filter(u => u.id !== user?.id && searchTerm.length > 0 && (u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()))).slice(0, 5);
+  const navItems = [{
+    path: '/dashboard',
+    label: 'Community',
+    icon: Users
+  }, {
+    path: '/profile',
+    label: 'Profile',
+    icon: User
+  }, ...(user?.isAdmin ? [{
+    path: '/admin',
+    label: 'Admin',
+    icon: Settings
+  }] : [])];
+  return <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-8">
@@ -60,68 +52,39 @@ const Navbar = () => {
             </Link>
             
             <div className="hidden md:flex space-x-4">
-              {navItems.map(({ path, label, icon: Icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === path
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
-                >
+              {navItems.map(({
+              path,
+              label,
+              icon: Icon
+            }) => <Link key={path} to={path} className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${location.pathname === path ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}>
                   <Icon className="h-4 w-4" />
                   <span>{label}</span>
-                </Link>
-              ))}
+                </Link>)}
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
             {/* Mobile Menu Button (Dashboard only) */}
-            {location.pathname === '/dashboard' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  // Trigger sidebar toggle via custom event
-                  window.dispatchEvent(new CustomEvent('toggleSidebar'));
-                }}
-                className="lg:hidden"
-              >
+            {location.pathname === '/dashboard' && <Button variant="ghost" size="sm" onClick={() => {
+            // Trigger sidebar toggle via custom event
+            window.dispatchEvent(new CustomEvent('toggleSidebar'));
+          }} className="lg:hidden">
                 <Menu className="h-5 w-5" />
-              </Button>
-            )}
+              </Button>}
             
             {/* Search Bar */}
             <div className="relative">
               <form onSubmit={handleSearch} className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search profiles..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setShowSearchResults(e.target.value.length > 0);
-                  }}
-                  onFocus={() => setShowSearchResults(searchTerm.length > 0)}
-                  onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
-                  className="pl-10 w-64"
-                />
+                
               </form>
               
-              {showSearchResults && filteredUsers.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-50 mt-1">
-                  {filteredUsers.map((member) => (
-                    <button
-                      key={member.id}
-                      onClick={() => {
-                        navigate(`/profile/${member.id}`);
-                        setShowSearchResults(false);
-                        setSearchTerm('');
-                      }}
-                      className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 text-left"
-                    >
+              {showSearchResults && filteredUsers.length > 0 && <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg z-50 mt-1">
+                  {filteredUsers.map(member => <button key={member.id} onClick={() => {
+                navigate(`/profile/${member.id}`);
+                setShowSearchResults(false);
+                setSearchTerm('');
+              }} className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 text-left">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={member.avatar} alt={member.name} />
                         <AvatarFallback className="bg-purple-100 text-purple-700">
@@ -132,10 +95,8 @@ const Navbar = () => {
                         <p className="font-medium text-gray-900">{member.name}</p>
                         <p className="text-sm text-gray-500">{member.email}</p>
                       </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+                    </button>)}
+                </div>}
             </div>
 
             <DropdownMenu>
@@ -163,12 +124,10 @@ const Navbar = () => {
                   <User className="mr-2 h-4 w-4" />
                   Profile
                 </DropdownMenuItem>
-                {user?.isAdmin && (
-                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                {user?.isAdmin && <DropdownMenuItem onClick={() => navigate('/admin')}>
                     <Settings className="mr-2 h-4 w-4" />
                     Admin
-                  </DropdownMenuItem>
-                )}
+                  </DropdownMenuItem>}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                   <LogOut className="mr-2 h-4 w-4" />
@@ -179,8 +138,6 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </nav>
-  );
+    </nav>;
 };
-
 export default Navbar;
