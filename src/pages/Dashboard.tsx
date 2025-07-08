@@ -181,7 +181,13 @@ const Dashboard = () => {
     });
   };
 
-  const otherProfiles = profiles.filter(p => p.user_id !== user?.id);
+  // Filter to show only other users (not current user) and exclude any null/undefined profiles
+  const otherProfiles = profiles.filter(p => 
+    p.user_id !== user?.id && 
+    p.display_name && 
+    p.user_id
+  );
+  
   const filteredUsers = otherProfiles.filter(p => 
     p.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.user_id.toLowerCase().includes(searchTerm.toLowerCase())
