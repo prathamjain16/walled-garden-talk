@@ -91,6 +91,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = async (email: string, password: string, name: string) => {
+    // Check if email is in allowlist first
+    const { data: isAllowed } = await supabase
+      .rpc('is_email_allowed', { email_to_check: email });
+    
+    if (!isAllowed) {
+      throw new Error('This email is not authorized for registration. Please contact an administrator.');
+    }
+    
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
