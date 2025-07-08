@@ -27,6 +27,7 @@ interface Profile {
   avatar_url: string | null;
   bio: string | null;
   is_admin: boolean;
+  email: string;
 }
 
 const Dashboard = () => {
@@ -190,7 +191,7 @@ const Dashboard = () => {
   
   const filteredUsers = otherProfiles.filter(p => 
     p.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.user_id.toLowerCase().includes(searchTerm.toLowerCase())
+    p.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -298,7 +299,7 @@ const Dashboard = () => {
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {member.display_name || 'Unknown User'}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">{member.user_id}</p>
+                  <p className="text-xs text-gray-500 truncate">{member.email}</p>
                   {member.is_admin && (
                     <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mt-1">
                       Admin
