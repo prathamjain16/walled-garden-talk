@@ -18,7 +18,6 @@ interface User {
   avatar?: string;
   bio?: string;
   isAdmin?: boolean;
-  needsProfileSetup?: boolean;
 }
 
 interface AuthContextType {
@@ -45,19 +44,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .eq('user_id', supabaseUser.id)
       .maybeSingle();
 
-    // Check if profile needs setup (missing display name or it's just the email prefix)
-    const needsSetup = !profile || 
-      !profile.display_name || 
-      profile.display_name === supabaseUser.email?.split('@')[0];
-
     return {
       id: supabaseUser.id,
       name: profile?.display_name || supabaseUser.email?.split('@')[0] || 'User',
       email: supabaseUser.email || '',
       avatar: profile?.avatar_url || undefined,
       bio: profile?.bio || undefined,
-      isAdmin: profile?.is_admin || false,
-      needsProfileSetup: needsSetup
+      isAdmin: profile?.is_admin || false
     };
   };
 
