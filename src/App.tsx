@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import ProfileSetup from "./pages/ProfileSetup";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
@@ -25,7 +26,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  // Check if user needs profile setup
+  if (user.needsProfileSetup) {
+    return <Navigate to="/profile-setup" />;
+  }
+  
+  return <>{children}</>;
 };
 
 const AppContent = () => {
@@ -36,6 +46,7 @@ const AppContent = () => {
       {user && <Navbar />}
       <Routes>
         <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <LoginPage />} />
+        <Route path="/profile-setup" element={user && !user.needsProfileSetup ? <Navigate to="/dashboard" /> : <ProfileSetup />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/profile/:userId?" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
