@@ -37,12 +37,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const mapSupabaseUserToUser = async (supabaseUser: SupabaseUser): Promise<User> => {
-    // Fetch profile data
+    // Fetch profile data - use maybeSingle to avoid errors if profile doesn't exist
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', supabaseUser.id)
-      .single();
+      .maybeSingle();
 
     return {
       id: supabaseUser.id,
@@ -55,17 +55,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    // Set up auth state listener
+    // Set up auth state listener - CRITICAL: Don't use async to prevent deadlocks
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
+        setLoading(false);
+        
+        // Use setTimeout to defer async operations and prevent deadlocks
         if (session?.user) {
-          const mappedUser = await mapSupabaseUserToUser(session.user);
-          setUser(mappedUser);
+          setTimeout(() => {
+            mapSupabaseUserToUser(session.user).then(setUser).catch(console.error);
+          }, 0);
         } else {
           setUser(null);
         }
-        setLoading(false);
       }
     );
 
@@ -73,7 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       if (session?.user) {
-        mapSupabaseUserToUser(session.user).then(setUser);
+        mapSupabaseUserToUser(session.user).then(setUser).catch(console.error);
       }
       setLoading(false);
     });
@@ -92,8 +95,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signup = async (email: string, password: string, name: string) => {
     // Check if email is in allowlist first
-    const { data: isAllowed } = await supabase
+    const { data: isAllowed, error: allowlistError } = await supabase
       .rpc('is_email_allowed', { email_to_check: email });
+    
+    if (allowlistError) {
+      console.error('Allowlist check error:', allowlistError);
+      throw new Error('Unable to verify email authorization. Please try again.');
+    }
     
     if (!isAllowed) {
       throw new Error('This email is not authorized for registration. Please contact an administrator.');
