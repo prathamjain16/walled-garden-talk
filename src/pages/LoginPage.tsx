@@ -30,9 +30,10 @@ const LoginPage = () => {
         description: "You've successfully logged in.",
       });
     } catch (error) {
+      console.error('Login error:', error);
       toast({
         title: "Login failed",
-        description: error instanceof Error ? error.message : "Invalid credentials",
+        description: error instanceof Error ? error.message : "Invalid credentials. Please check your email and password.",
         variant: "destructive",
       });
     } finally {
@@ -51,19 +52,32 @@ const LoginPage = () => {
       });
       return;
     }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsLoading(true);
     
     try {
       await signup(formData.email, formData.password, formData.name);
       toast({
-        title: "Account created!",
-        description: "Welcome to the community.",
+        title: "Account created successfully!",
+        description: "Welcome to the community. You can now sign in.",
       });
+      
+      // Reset form and switch to login tab
+      setFormData({ email: '', password: '', name: '', confirmPassword: '' });
     } catch (error) {
+      console.error('Signup error:', error);
       toast({
         title: "Signup failed",
-        description: error instanceof Error ? error.message : "Failed to create account",
+        description: error instanceof Error ? error.message : "Failed to create account. Please try again.",
         variant: "destructive",
       });
     } finally {
