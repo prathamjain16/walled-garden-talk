@@ -18,6 +18,13 @@ interface User {
   avatar?: string;
   bio?: string;
   isAdmin?: boolean;
+  class?: string;
+  section?: string;
+  batch?: string;
+  hobby?: string;
+  website?: string;
+  social?: string;
+  about?: string;
 }
 
 interface AuthContextType {
@@ -50,7 +57,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: supabaseUser.email || '',
       avatar: profile?.avatar_url || undefined,
       bio: profile?.bio || undefined,
-      isAdmin: profile?.is_admin || false
+      isAdmin: profile?.is_admin || false,
+      class: profile?.class || undefined,
+      section: profile?.section || undefined,
+      batch: profile?.batch || undefined,
+      hobby: profile?.hobby || undefined,
+      website: profile?.website || undefined,
+      social: profile?.social || undefined,
+      about: profile?.about || undefined
     };
   };
 
@@ -135,7 +149,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .update({
         display_name: updates.name,
         avatar_url: updates.avatar,
-        bio: updates.bio
+        bio: updates.bio,
+        class: updates.class,
+        section: updates.section,
+        batch: updates.batch,
+        hobby: updates.hobby,
+        website: updates.website,
+        social: updates.social,
+        about: updates.about
       })
       .eq('user_id', user.id);
     

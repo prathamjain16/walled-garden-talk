@@ -55,37 +55,58 @@ export type Database = {
       }
       profiles: {
         Row: {
+          about: string | null
           avatar_url: string | null
+          batch: string | null
           bio: string | null
+          class: string | null
           created_at: string
           display_name: string | null
           email: string
+          hobby: string | null
           id: string
           is_admin: boolean | null
+          section: string | null
+          social: string | null
           updated_at: string
           user_id: string
+          website: string | null
         }
         Insert: {
+          about?: string | null
           avatar_url?: string | null
+          batch?: string | null
           bio?: string | null
+          class?: string | null
           created_at?: string
           display_name?: string | null
           email: string
+          hobby?: string | null
           id?: string
           is_admin?: boolean | null
+          section?: string | null
+          social?: string | null
           updated_at?: string
           user_id: string
+          website?: string | null
         }
         Update: {
+          about?: string | null
           avatar_url?: string | null
+          batch?: string | null
           bio?: string | null
+          class?: string | null
           created_at?: string
           display_name?: string | null
           email?: string
+          hobby?: string | null
           id?: string
           is_admin?: boolean | null
+          section?: string | null
+          social?: string | null
           updated_at?: string
           user_id?: string
+          website?: string | null
         }
         Relationships: []
       }
