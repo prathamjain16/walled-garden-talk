@@ -16,6 +16,14 @@ interface Profile {
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
+  about: string | null;
+  class: string | null;
+  section: string | null;
+  batch: string | null;
+  hobby: string | null;
+  website: string | null;
+  social: string | null;
+  email: string;
   is_admin: boolean;
   created_at: string;
 }
@@ -28,6 +36,13 @@ const ProfilePage = () => {
   const [profileData, setProfileData] = useState({
     name: '',
     bio: '',
+    about: '',
+    class: '',
+    section: '',
+    batch: '',
+    hobby: '',
+    website: '',
+    social: '',
     avatar: ''
   });
 
@@ -51,6 +66,13 @@ const ProfilePage = () => {
         setProfileData({
           name: data.display_name || '',
           bio: data.bio || '',
+          about: data.about || '',
+          class: data.class || '',
+          section: data.section || '',
+          batch: data.batch || '',
+          hobby: data.hobby || '',
+          website: data.website || '',
+          social: data.social || '',
           avatar: data.avatar_url || ''
         });
       }
@@ -66,6 +88,13 @@ const ProfilePage = () => {
       await updateProfile({
         name: profileData.name,
         bio: profileData.bio,
+        about: profileData.about,
+        class: profileData.class,
+        section: profileData.section,
+        batch: profileData.batch,
+        hobby: profileData.hobby,
+        website: profileData.website,
+        social: profileData.social,
         avatar: profileData.avatar
       });
       setIsEditing(false);
@@ -80,6 +109,13 @@ const ProfilePage = () => {
           ...profileUser,
           display_name: profileData.name,
           bio: profileData.bio,
+          about: profileData.about,
+          class: profileData.class,
+          section: profileData.section,
+          batch: profileData.batch,
+          hobby: profileData.hobby,
+          website: profileData.website,
+          social: profileData.social,
           avatar_url: profileData.avatar
         });
       }
@@ -97,6 +133,13 @@ const ProfilePage = () => {
       setProfileData({
         name: profileUser.display_name || '',
         bio: profileUser.bio || '',
+        about: profileUser.about || '',
+        class: profileUser.class || '',
+        section: profileUser.section || '',
+        batch: profileUser.batch || '',
+        hobby: profileUser.hobby || '',
+        website: profileUser.website || '',
+        social: profileUser.social || '',
         avatar: profileUser.avatar_url || ''
       });
     }
@@ -108,7 +151,7 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card>
           <CardContent className="text-center py-8">
-            <p className="text-gray-500">User not found</p>
+            <p className="text-muted-foreground">User not found</p>
           </CardContent>
         </Card>
       </div>
@@ -150,9 +193,9 @@ const ProfilePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-1">
               <div className="text-center">
-                <Avatar className="h-32 w-32 mx-auto mb-4">
+                 <Avatar className="h-32 w-32 mx-auto mb-4">
                   <AvatarImage src={profileUser.avatar_url || undefined} alt={profileUser.display_name || 'User'} />
-                  <AvatarFallback className="bg-purple-100 text-purple-700 text-2xl">
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl">
                     {(profileUser.display_name || 'U').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
@@ -169,8 +212,8 @@ const ProfilePage = () => {
                   </div>
                 )}
                 
-                {profileUser.is_admin && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800 mt-4">
+                 {profileUser.is_admin && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary mt-4">
                     Administrator
                   </span>
                 )}
@@ -194,30 +237,144 @@ const ProfilePage = () => {
               
               <div>
                 <Label htmlFor="email" className="text-base font-semibold">Email</Label>
-                <p className="mt-2 text-gray-600">{user?.email || 'Not available'}</p>
+                <p className="mt-2 text-muted-foreground">{profileUser.email || 'Not available'}</p>
+              </div>
+
+              <div>
+                <Label htmlFor="class" className="text-base font-semibold">Class</Label>
+                {isEditing ? (
+                  <Input
+                    id="class"
+                    placeholder="Enter your class"
+                    value={profileData.class}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, class: e.target.value }))}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground">{profileUser.class || 'Not specified'}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="section" className="text-base font-semibold">Section</Label>
+                {isEditing ? (
+                  <Input
+                    id="section"
+                    placeholder="Enter your section"
+                    value={profileData.section}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, section: e.target.value }))}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground">{profileUser.section || 'Not specified'}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="batch" className="text-base font-semibold">Batch</Label>
+                {isEditing ? (
+                  <Input
+                    id="batch"
+                    placeholder="Enter your batch"
+                    value={profileData.batch}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, batch: e.target.value }))}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground">{profileUser.batch || 'Not specified'}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="hobby" className="text-base font-semibold">Hobby</Label>
+                {isEditing ? (
+                  <Input
+                    id="hobby"
+                    placeholder="Enter your hobby"
+                    value={profileData.hobby}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, hobby: e.target.value }))}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground">{profileUser.hobby || 'Not specified'}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="website" className="text-base font-semibold">Website</Label>
+                {isEditing ? (
+                  <Input
+                    id="website"
+                    placeholder="https://example.com"
+                    value={profileData.website}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground">
+                    {profileUser.website ? (
+                      <a href={profileUser.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        {profileUser.website}
+                      </a>
+                    ) : 'Not specified'}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="social" className="text-base font-semibold">Social Media</Label>
+                {isEditing ? (
+                  <Input
+                    id="social"
+                    placeholder="@username or social media handle"
+                    value={profileData.social}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, social: e.target.value }))}
+                    className="mt-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground">{profileUser.social || 'Not specified'}</p>
+                )}
               </div>
               
               <div>
-                <Label htmlFor="bio" className="text-base font-semibold">About</Label>
+                <Label htmlFor="bio" className="text-base font-semibold">Bio</Label>
                 {isEditing ? (
                   <Textarea
                     id="bio"
-                    placeholder="Tell us about yourself..."
+                    placeholder="A brief bio..."
                     value={profileData.bio}
                     onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
+                    className="mt-2"
+                    rows={3}
+                  />
+                ) : (
+                  <p className="mt-2 text-muted-foreground whitespace-pre-wrap">
+                    {profileUser.bio || 'No bio available.'}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="about" className="text-base font-semibold">About</Label>
+                {isEditing ? (
+                  <Textarea
+                    id="about"
+                    placeholder="Tell us more about yourself..."
+                    value={profileData.about}
+                    onChange={(e) => setProfileData(prev => ({ ...prev, about: e.target.value }))}
                     className="mt-2"
                     rows={4}
                   />
                 ) : (
-                  <p className="mt-2 text-gray-700 whitespace-pre-wrap">
-                    {profileUser.bio || 'No bio available.'}
+                  <p className="mt-2 text-muted-foreground whitespace-pre-wrap">
+                    {profileUser.about || 'No additional information available.'}
                   </p>
                 )}
               </div>
               
               <div>
                 <Label className="text-base font-semibold">Member Since</Label>
-                <p className="mt-2 text-gray-600">
+                <p className="mt-2 text-muted-foreground">
                   {new Date(profileUser.created_at).toLocaleDateString('en-US', { 
                     year: 'numeric', 
                     month: 'long', 
