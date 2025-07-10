@@ -51,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       .eq('user_id', supabaseUser.id)
       .maybeSingle();
 
-    const user = {
+    return {
       id: supabaseUser.id,
       name: profile?.display_name || supabaseUser.email?.split('@')[0] || 'User',
       email: supabaseUser.email || '',
@@ -66,18 +66,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       social: profile?.social || undefined,
       about: profile?.about || undefined
     };
-
-    // Check if profile is incomplete (missing required fields)
-    const isProfileIncomplete = !profile || !profile.class || !profile.section || !profile.batch;
-    
-    // Redirect to profile setup if incomplete and not already there
-    if (isProfileIncomplete && !window.location.pathname.includes('/profile-setup')) {
-      setTimeout(() => {
-        window.location.href = '/profile-setup';
-      }, 100);
-    }
-
-    return user;
   };
 
   useEffect(() => {

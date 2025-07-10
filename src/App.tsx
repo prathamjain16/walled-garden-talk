@@ -26,7 +26,19 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
   
-  return user ? <>{children}</> : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  // Check if profile is incomplete and redirect to setup
+  const isProfileIncomplete = !user.class || !user.section || !user.batch;
+  const isOnProfileSetup = window.location.pathname === '/profile-setup';
+  
+  if (isProfileIncomplete && !isOnProfileSetup) {
+    return <Navigate to="/profile-setup" replace />;
+  }
+  
+  return <>{children}</>;
 };
 
 const AppContent = () => {
