@@ -197,7 +197,7 @@ const Dashboard = () => {
   return (
     <div className="h-[calc(100vh-64px)] flex relative">
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white min-w-0">
+      <div className="flex-1 flex flex-col bg-background min-w-0">
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
           {messages.map(message => {
@@ -208,14 +208,14 @@ const Dashboard = () => {
                 <div className={`flex space-x-2 max-w-[85%] sm:max-w-[75%] lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
                   <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarImage src={message.profiles?.avatar_url || undefined} alt={senderName} />
-                    <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
                       {senderName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-900'}`}>
+                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
                     <p className="text-xs font-medium mb-1">{senderName}</p>
                     <p className="text-sm break-words">{message.content}</p>
-                    <p className={`text-xs mt-1 ${isOwnMessage ? 'text-purple-200' : 'text-gray-500'}`}>
+                    <p className={`text-xs mt-1 ${isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                       {formatTime(message.created_at)}
                     </p>
                   </div>
@@ -227,7 +227,7 @@ const Dashboard = () => {
         </div>
         
         {/* Message Input */}
-        <div className="border-t p-3 lg:p-4 flex-shrink-0 bg-white">
+        <div className="border-t p-3 lg:p-4 flex-shrink-0 bg-background">
           <form onSubmit={handleSendMessage} className="flex space-x-2">
             <Input 
               placeholder="Type your message..." 
@@ -252,15 +252,15 @@ const Dashboard = () => {
         right-0
         h-full lg:h-auto
         w-full sm:w-80 lg:w-80
-        bg-gray-50 border-l border-gray-200
+        bg-muted/30 border-l border-border
         flex-shrink-0
         z-50 lg:z-auto
         flex flex-col
       `}>
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-gray-200 flex-shrink-0">
+        <div className="p-4 border-b border-border flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Users className="h-5 w-5" />
               Community Members
             </h3>
@@ -274,7 +274,7 @@ const Dashboard = () => {
             </Button>
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input 
               placeholder="Search members..." 
               value={searchTerm} 
@@ -288,20 +288,20 @@ const Dashboard = () => {
         <div className="flex-1 overflow-y-auto p-4">
           <div className="space-y-3">
             {filteredUsers.map(member => (
-              <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-white">
+              <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent">
                 <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarImage src={member.avatar_url || undefined} alt={member.display_name || 'User'} />
-                  <AvatarFallback className="bg-purple-100 text-purple-700">
+                  <AvatarFallback className="bg-primary/10 text-primary">
                     {(member.display_name || 'U').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-foreground truncate">
                     {member.display_name || 'Unknown User'}
                   </p>
-                  <p className="text-xs text-gray-500 truncate">{member.email}</p>
+                  <p className="text-xs text-muted-foreground truncate">{member.email}</p>
                   {member.is_admin && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 mt-1">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary mt-1">
                       Admin
                     </span>
                   )}
@@ -317,7 +317,7 @@ const Dashboard = () => {
           
           {filteredUsers.length === 0 && searchTerm && (
             <div className="text-center py-4">
-              <p className="text-gray-500">No members found matching "{searchTerm}"</p>
+              <p className="text-muted-foreground">No members found matching "{searchTerm}"</p>
             </div>
           )}
         </div>
