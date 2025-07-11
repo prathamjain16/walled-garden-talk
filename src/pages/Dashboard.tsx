@@ -252,7 +252,7 @@ const Dashboard = () => {
         right-0
         h-full lg:h-auto
         w-full sm:w-80 lg:w-80
-        bg-muted/30 border-l border-border
+        bg-background dark:bg-black border-l border-border
         flex-shrink-0
         z-50 lg:z-auto
         flex flex-col
@@ -288,7 +288,7 @@ const Dashboard = () => {
         <div className="flex-1 overflow-y-auto p-4">
           <div className="space-y-3">
             {filteredUsers.map(member => (
-              <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent">
+              <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent dark:hover:bg-gray-800">
                 <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarImage src={member.avatar_url || undefined} alt={member.display_name || 'User'} />
                   <AvatarFallback className="bg-primary/10 text-primary">

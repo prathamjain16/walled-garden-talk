@@ -149,7 +149,7 @@ const ProfilePage = () => {
   if (!profileUser) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card>
+        <Card className="dark:bg-black">
           <CardContent className="text-center py-8">
             <p className="text-muted-foreground">User not found</p>
           </CardContent>
@@ -160,7 +160,7 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Card>
+      <Card className="dark:bg-black">
         <CardHeader className="pb-6">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">
