@@ -242,7 +242,7 @@ const Dashboard = () => {
                       {senderName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-blue-600 text-white dark:bg-blue-700' : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'}`}>
+                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-blue-600 text-white dark:bg-blue-700' : 'bg-gray-200 text-gray-900 dark:bg-gray-900 dark:text-gray-100'}`}>
                     <p className="text-xs font-medium mb-1">{senderName}</p>
                     <div className="text-sm break-words">{linkifyText(message.content)}</div>
                     <p className={`text-xs mt-1 ${isOwnMessage ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
