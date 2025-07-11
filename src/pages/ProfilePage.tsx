@@ -148,18 +148,21 @@ const ProfilePage = () => {
 
   if (!profileUser) {
     return (
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="dark:bg-black">
-          <CardContent className="text-center py-8">
-            <p className="text-muted-foreground">User not found</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background dark:bg-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Card className="dark:bg-black">
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground">User not found</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-background dark:bg-slate-900">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <Card className="dark:bg-black">
         <CardHeader className="pb-6">
           <div className="flex items-center justify-between">
@@ -386,6 +389,7 @@ const ProfilePage = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
