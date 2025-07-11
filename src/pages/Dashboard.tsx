@@ -9,6 +9,29 @@ import { MessageSquare, Users, Search, Send, Menu, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+// Helper function to detect and linkify URLs in text
+const linkifyText = (text: string) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+  
+  return parts.map((part, index) => {
+    if (urlRegex.test(part)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-400 hover:text-blue-300 underline break-all"
+        >
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+};
+
 interface Message {
   id: string;
   user_id: string;
@@ -112,6 +135,7 @@ const Dashboard = () => {
           table: 'messages'
         },
         async (payload) => {
+          console.log('New message received:', payload);
           // Fetch the new message 
           const { data: newMessageData } = await supabase
             .from('messages')
@@ -136,7 +160,9 @@ const Dashboard = () => {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(messagesChannel);
@@ -212,10 +238,10 @@ const Dashboard = () => {
                       {senderName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
+                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-blue-600 text-white dark:bg-blue-700' : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'}`}>
                     <p className="text-xs font-medium mb-1">{senderName}</p>
-                    <p className="text-sm break-words">{message.content}</p>
-                    <p className={`text-xs mt-1 ${isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                    <div className="text-sm break-words">{linkifyText(message.content)}</div>
+                    <p className={`text-xs mt-1 ${isOwnMessage ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
                       {formatTime(message.created_at)}
                     </p>
                   </div>
