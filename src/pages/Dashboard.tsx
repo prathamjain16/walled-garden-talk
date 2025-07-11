@@ -11,18 +11,22 @@ import { toast } from '@/hooks/use-toast';
 
 // Helper function to detect and linkify URLs in text
 const linkifyText = (text: string) => {
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  // More comprehensive URL regex that includes www domains
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9-]+\.[a-zA-Z]{2,}[^\s]*)/g;
   const parts = text.split(urlRegex);
   
   return parts.map((part, index) => {
     if (urlRegex.test(part)) {
+      // Add protocol if missing
+      const url = part.startsWith('http') ? part : `https://${part}`;
       return (
         <a
           key={index}
-          href={part}
+          href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 underline break-all"
+          className="text-blue-400 hover:text-blue-300 underline break-all cursor-pointer"
+          onClick={(e) => e.stopPropagation()}
         >
           {part}
         </a>
