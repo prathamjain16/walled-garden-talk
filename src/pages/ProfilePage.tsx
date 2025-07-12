@@ -235,34 +235,37 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">
               {isOwnProfile ? 'Your Profile' : `${profileUser.display_name || 'User'}'s Profile`}
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
               {isOwnProfile ? 'Manage your personal information' : 'View user details'}
             </p>
           </div>
           {isOwnProfile && (
-            <div className="flex space-x-2">
+            <div className="flex space-x-1 sm:space-x-2">
               {isEditing ? (
                 <>
-                  <Button onClick={handleSave} className="animate-fade-in">
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
+                  <Button onClick={handleSave} className="animate-fade-in text-xs sm:text-sm px-2 sm:px-4">
+                    <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Save Changes</span>
+                    <span className="sm:hidden">Save</span>
                   </Button>
-                  <Button variant="outline" onClick={handleCancel}>
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel
+                  <Button variant="outline" onClick={handleCancel} className="text-xs sm:text-sm px-2 sm:px-4">
+                    <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Cancel</span>
+                    <span className="sm:hidden">×</span>
                   </Button>
                 </>
               ) : (
-                <Button onClick={() => setIsEditing(true)} className="hover-scale">
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Edit Profile
+                <Button onClick={() => setIsEditing(true)} className="hover-scale text-xs sm:text-sm px-2 sm:px-4">
+                  <Edit3 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">Edit Profile</span>
+                  <span className="sm:hidden">Edit</span>
                 </Button>
               )}
             </div>
@@ -270,35 +273,35 @@ const ProfilePage = () => {
         </div>
 
         {/* Profile Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Left Column - Avatar & Basic Info */}
           <div className="lg:col-span-1">
-            <div className="bg-card dark:bg-gray-800/50 rounded-2xl p-6 text-center backdrop-blur-sm border border-border/50">
-              <Avatar className="h-32 w-32 mx-auto mb-6 ring-4 ring-primary/10">
+            <div className="bg-card dark:bg-gray-800/50 rounded-2xl p-4 sm:p-6 text-center backdrop-blur-sm border border-border/50">
+              <Avatar className="h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32 mx-auto mb-4 sm:mb-6 ring-4 ring-primary/10">
                 <AvatarImage src={profileUser.avatar_url || undefined} alt={profileUser.display_name || 'User'} />
-                <AvatarFallback className="bg-primary/10 text-primary text-3xl">
+                <AvatarFallback className="bg-primary/10 text-primary text-xl sm:text-2xl lg:text-3xl">
                   {(profileUser.display_name || 'U').charAt(0)}
                 </AvatarFallback>
               </Avatar>
               
-              <h2 className="text-2xl font-bold text-foreground mb-2">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2">
                 {profileUser.display_name || 'Unknown User'}
               </h2>
               
               {profileUser.is_admin && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary mb-4">
+                <span className="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-primary/10 text-primary mb-3 sm:mb-4">
                   Administrator
                 </span>
               )}
 
               {/* Contact Info */}
-              <div className="space-y-3 mt-6 text-sm">
+              <div className="space-y-2 sm:space-y-3 mt-4 sm:mt-6 text-xs sm:text-sm">
                 <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                  <span>{profileUser.email}</span>
+                  <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="truncate">{profileUser.email}</span>
                 </div>
                 <div className="flex items-center justify-center space-x-2 text-muted-foreground">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
                   <span>
                     Joined {new Date(profileUser.created_at).toLocaleDateString('en-US', { 
                       month: 'short', 
@@ -308,12 +311,12 @@ const ProfilePage = () => {
                 </div>
                 {profileUser.website && !isEditing && (
                   <div className="flex items-center justify-center space-x-2">
-                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <Globe className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
                     <a 
                       href={profileUser.website} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="text-primary hover:underline"
+                      className="text-primary hover:underline truncate"
                     >
                       Website
                     </a>
@@ -374,151 +377,151 @@ const ProfilePage = () => {
           </div>
           
           {/* Right Column - Detailed Information */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Basic Information */}
-            <div className="bg-card dark:bg-gray-800/50 rounded-2xl p-6 backdrop-blur-sm border border-border/50">
-              <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center">
-                <Users className="h-5 w-5 mr-2" />
+            <div className="bg-card dark:bg-gray-800/50 rounded-2xl p-4 sm:p-6 backdrop-blur-sm border border-border/50">
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6 flex items-center">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Basic Information
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Name</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Name</Label>
                   {isEditing ? (
                     <Input
                       value={profileData.name}
                       onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-lg font-medium text-foreground">{profileUser.display_name || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base lg:text-lg font-medium text-foreground">{profileUser.display_name || 'Not specified'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Class</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Class</Label>
                   {isEditing ? (
                     <Input
                       placeholder="Enter your class"
                       value={profileData.class}
                       onChange={(e) => setProfileData(prev => ({ ...prev, class: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-lg font-medium text-foreground">{profileUser.class || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base lg:text-lg font-medium text-foreground">{profileUser.class || 'Not specified'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Section</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Section</Label>
                   {isEditing ? (
                     <Input
                       placeholder="Enter your section"
                       value={profileData.section}
                       onChange={(e) => setProfileData(prev => ({ ...prev, section: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-lg font-medium text-foreground">{profileUser.section || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base lg:text-lg font-medium text-foreground">{profileUser.section || 'Not specified'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Batch</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Batch</Label>
                   {isEditing ? (
                     <Input
                       placeholder="Enter your batch"
                       value={profileData.batch}
                       onChange={(e) => setProfileData(prev => ({ ...prev, batch: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-lg font-medium text-foreground">{profileUser.batch || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base lg:text-lg font-medium text-foreground">{profileUser.batch || 'Not specified'}</p>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Personal Information */}
-            <div className="bg-card dark:bg-gray-800/50 rounded-2xl p-6 backdrop-blur-sm border border-border/50">
-              <h3 className="text-xl font-semibold text-foreground mb-6 flex items-center">
-                <Heart className="h-5 w-5 mr-2" />
+            <div className="bg-card dark:bg-gray-800/50 rounded-2xl p-4 sm:p-6 backdrop-blur-sm border border-border/50">
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-4 sm:mb-6 flex items-center">
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Personal Information
               </h3>
               
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Hobby</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Hobby</Label>
                   {isEditing ? (
                     <Input
                       placeholder="Enter your hobby"
                       value={profileData.hobby}
                       onChange={(e) => setProfileData(prev => ({ ...prev, hobby: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-foreground">{profileUser.hobby || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base text-foreground">{profileUser.hobby || 'Not specified'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Website</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Website</Label>
                   {isEditing ? (
                     <Input
                       placeholder="https://example.com"
                       value={profileData.website}
                       onChange={(e) => setProfileData(prev => ({ ...prev, website: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-foreground">{profileUser.website || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base text-foreground break-all">{profileUser.website || 'Not specified'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Social Media</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Social Media</Label>
                   {isEditing ? (
                     <Input
                       placeholder="@username or social media handle"
                       value={profileData.social}
                       onChange={(e) => setProfileData(prev => ({ ...prev, social: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                     />
                   ) : (
-                    <p className="mt-2 text-foreground">{profileUser.social || 'Not specified'}</p>
+                    <p className="mt-2 text-sm sm:text-base text-foreground">{profileUser.social || 'Not specified'}</p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Bio</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">Bio</Label>
                   {isEditing ? (
                     <Textarea
                       placeholder="A brief bio..."
                       value={profileData.bio}
                       onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                       rows={3}
                     />
                   ) : (
-                    <p className="mt-2 text-foreground whitespace-pre-wrap leading-relaxed">
+                    <p className="mt-2 text-sm sm:text-base text-foreground whitespace-pre-wrap leading-relaxed">
                       {profileUser.bio || 'No bio available.'}
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground">About</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-muted-foreground">About</Label>
                   {isEditing ? (
                     <Textarea
                       placeholder="Tell us more about yourself..."
                       value={profileData.about}
                       onChange={(e) => setProfileData(prev => ({ ...prev, about: e.target.value }))}
-                      className="mt-2"
+                      className="mt-2 text-sm sm:text-base"
                       rows={4}
                     />
                   ) : (
-                    <p className="mt-2 text-foreground whitespace-pre-wrap leading-relaxed">
+                    <p className="mt-2 text-sm sm:text-base text-foreground whitespace-pre-wrap leading-relaxed">
                       {profileUser.about || 'No additional information available.'}
                     </p>
                   )}
