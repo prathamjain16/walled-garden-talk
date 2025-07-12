@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Edit3, Save, X, Mail, Calendar, Globe, Users, Heart } from 'lucide-react';
+import { Edit3, Save, X, Mail, Calendar, Globe, Users, Heart, Camera, Upload } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -44,6 +44,7 @@ const ProfilePage = () => {
     social: '',
     avatar: ''
   });
+  const [uploading, setUploading] = useState(false);
 
   const isOwnProfile = !userId || userId === user?.id;
 
@@ -143,6 +144,81 @@ const ProfilePage = () => {
       });
     }
     setIsEditing(false);
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user?.id) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a JPEG, PNG, WebP, or GIF image.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please upload an image smaller than 5MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      // Delete old avatar if exists
+      if (profileUser?.avatar_url) {
+        const oldPath = profileUser.avatar_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage
+            .from('avatars')
+            .remove([`${user.id}/${oldPath}`]);
+        }
+      }
+
+      // Upload new avatar
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update profile data
+      setProfileData(prev => ({ ...prev, avatar: publicUrl }));
+
+      toast({
+        title: "Image uploaded",
+        description: "Your profile image has been uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload image. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (!profileUser) {
@@ -248,14 +324,49 @@ const ProfilePage = () => {
               {isEditing && (
                 <div className="mt-6 space-y-3">
                   <div>
-                    <Label htmlFor="avatar" className="text-sm font-medium">Avatar URL</Label>
-                    <Input
-                      id="avatar"
-                      placeholder="https://example.com/avatar.jpg"
-                      value={profileData.avatar}
-                      onChange={(e) => setProfileData(prev => ({ ...prev, avatar: e.target.value }))}
-                      className="mt-1"
-                    />
+                    <Label className="text-sm font-medium">Profile Image</Label>
+                    <div className="mt-2 flex items-center gap-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={uploading}
+                        onClick={() => document.getElementById('avatar-upload')?.click()}
+                        className="relative"
+                      >
+                        {uploading ? (
+                          <>
+                            <Upload className="h-4 w-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Camera className="h-4 w-4 mr-2" />
+                            Upload Image
+                          </>
+                        )}
+                      </Button>
+                      <input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <span className="text-xs text-muted-foreground">
+                        Max 5MB • JPEG, PNG, WebP, GIF
+                      </span>
+                    </div>
+                    <div className="mt-2">
+                      <Label htmlFor="avatar-url" className="text-xs text-muted-foreground">Or paste URL:</Label>
+                      <Input
+                        id="avatar-url"
+                        placeholder="https://example.com/avatar.jpg"
+                        value={profileData.avatar}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, avatar: e.target.value }))}
+                        className="mt-1 text-sm"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
