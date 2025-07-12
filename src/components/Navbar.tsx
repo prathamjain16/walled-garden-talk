@@ -62,8 +62,9 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center space-x-8">
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <MessageSquare className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">Community Chat</span>
+              <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <span className="text-lg sm:text-xl font-bold text-foreground hidden xs:inline">Community Chat</span>
+              <span className="text-lg sm:text-xl font-bold text-foreground xs:hidden">Chat</span>
             </Link>
             
             <div className="hidden md:flex space-x-4">
@@ -78,36 +79,36 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Theme Toggle */}
-            <Button variant="ghost" size="sm" onClick={toggleTheme}>
-              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            <Button variant="ghost" size="sm" onClick={toggleTheme} className="h-8 w-8 sm:h-10 sm:w-10">
+              {isDark ? <Sun className="h-4 w-4 sm:h-5 sm:w-5" /> : <Moon className="h-4 w-4 sm:h-5 sm:w-5" />}
             </Button>
 
             {/* Mobile Menu Button (Dashboard only) */}
             {location.pathname === '/dashboard' && <Button variant="ghost" size="sm" onClick={() => {
             // Trigger sidebar toggle via custom event
             window.dispatchEvent(new CustomEvent('toggleSidebar'));
-          }} className="lg:hidden">
-                <Search className="h-5 w-5" />
+          }} className="lg:hidden h-8 w-8 sm:h-10 sm:w-10">
+                <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10">
+                <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full">
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs sm:text-sm">
                       {user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuContent className="w-48 sm:w-56" align="end">
                 <div className="flex items-center justify-start gap-2 p-2">
                   <div className="flex flex-col space-y-1 leading-none">
-                    <p className="font-medium">{user?.name}</p>
-                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                    <p className="font-medium text-sm sm:text-base">{user?.name}</p>
+                    <p className="w-[160px] sm:w-[200px] truncate text-xs sm:text-sm text-muted-foreground">
                       {user?.email}
                     </p>
                   </div>

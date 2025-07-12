@@ -229,20 +229,20 @@ const Dashboard = () => {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col bg-background min-w-0">
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3 lg:space-y-4">
+        <div className="flex-1 overflow-y-auto p-2 sm:p-3 lg:p-4 space-y-2 sm:space-y-3 lg:space-y-4">
           {messages.map(message => {
             const isOwnMessage = message.user_id === user?.id;
             const senderName = message.profiles?.display_name || 'Unknown User';
             return (
               <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex space-x-2 max-w-[85%] sm:max-w-[75%] lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
-                  <Avatar className="h-8 w-8 flex-shrink-0">
+                <div className={`flex space-x-1 sm:space-x-2 max-w-[90%] sm:max-w-[85%] lg:max-w-md ${isOwnMessage ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                  <Avatar className="h-6 w-6 sm:h-8 sm:w-8 flex-shrink-0">
                     <AvatarImage src={message.profiles?.avatar_url || undefined} alt={senderName} />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs">
                       {senderName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  <div className={`rounded-lg p-3 ${isOwnMessage ? 'bg-blue-600 text-white dark:bg-blue-700' : 'bg-gray-200 text-gray-900 dark:bg-gray-900 dark:text-gray-100'}`}>
+                  <div className={`rounded-lg p-2 sm:p-3 ${isOwnMessage ? 'bg-blue-600 text-white dark:bg-blue-700' : 'bg-gray-200 text-gray-900 dark:bg-gray-900 dark:text-gray-100'}`}>
                     <p className="text-xs font-medium mb-1">{senderName}</p>
                     <div className="text-sm break-words">{linkifyText(message.content)}</div>
                     <p className={`text-xs mt-1 ${isOwnMessage ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}>
@@ -257,16 +257,17 @@ const Dashboard = () => {
         </div>
         
         {/* Message Input */}
-        <div className="border-t p-3 lg:p-4 flex-shrink-0 bg-background">
-          <form onSubmit={handleSendMessage} className="flex space-x-2">
+        <div className="border-t p-2 sm:p-3 lg:p-4 flex-shrink-0 bg-background">
+          <form onSubmit={handleSendMessage} className="flex space-x-1 sm:space-x-2">
             <Input 
               placeholder="Type your message..." 
               value={newMessage} 
               onChange={e => setNewMessage(e.target.value)} 
-              className="flex-1" 
+              className="flex-1 text-sm sm:text-base" 
             />
-            <Button type="submit" size="sm" disabled={!newMessage.trim()} className="flex-shrink-0">
-              <Send className="h-4 w-4" />
+            <Button type="submit" size="sm" disabled={!newMessage.trim()} className="flex-shrink-0 h-8 w-8 sm:h-9 sm:w-auto sm:px-3">
+              <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline ml-1">Send</span>
             </Button>
           </form>
         </div>
@@ -281,18 +282,19 @@ const Dashboard = () => {
         top-0 lg:top-auto
         right-0
         h-full lg:h-auto
-        w-full sm:w-80 lg:w-80
+        w-full sm:w-72 lg:w-80
         bg-background dark:bg-black border-l border-border
         flex-shrink-0
         z-50 lg:z-auto
         flex flex-col
       `}>
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-border flex-shrink-0">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Community Members
+        <div className="p-3 sm:p-4 border-b border-border flex-shrink-0">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground flex items-center gap-2">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="hidden sm:inline">Community Members</span>
+              <span className="sm:hidden">Members</span>
             </h3>
             <Button
               variant="ghost" 
@@ -306,27 +308,27 @@ const Dashboard = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input 
-              placeholder="Search members..." 
+              placeholder="Search..." 
               value={searchTerm} 
               onChange={e => setSearchTerm(e.target.value)} 
-              className="pl-10" 
+              className="pl-10 text-sm" 
             />
           </div>
         </div>
         
         {/* Members List */}
-        <div className="flex-1 overflow-y-auto p-4">
-          <div className="space-y-3">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+          <div className="space-y-2 sm:space-y-3">
             {filteredUsers.map(member => (
-              <div key={member.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-accent dark:hover:bg-gray-800">
-                <Avatar className="h-10 w-10 flex-shrink-0">
+              <div key={member.id} className="flex items-center space-x-2 sm:space-x-3 p-2 rounded-lg hover:bg-accent dark:hover:bg-gray-800">
+                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                   <AvatarImage src={member.avatar_url || undefined} alt={member.display_name || 'User'} />
-                  <AvatarFallback className="bg-primary/10 text-primary">
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs">
                     {(member.display_name || 'U').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">
+                  <p className="text-xs sm:text-sm font-medium text-foreground truncate">
                     {member.display_name || 'Unknown User'}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">{member.email}</p>
@@ -336,7 +338,7 @@ const Dashboard = () => {
                     </span>
                   )}
                 </div>
-                <Button asChild variant="outline" size="sm" className="flex-shrink-0">
+                <Button asChild variant="outline" size="sm" className="flex-shrink-0 h-7 px-2 sm:h-8 sm:px-3 text-xs sm:text-sm">
                   <Link to={`/profile/${member.user_id}`}>
                     View
                   </Link>
